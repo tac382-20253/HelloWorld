@@ -4,10 +4,18 @@ using UnityEngine;
 
 public class Gyro : MonoBehaviour
 {
+    private void Start()
+    {
+        Input.gyro.enabled = true;
+    }
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(Input.gyro.enabled);
-        transform.rotation = Input.gyro.attitude;        
+        transform.rotation = Quaternion.Inverse(GyroToUnity(Input.gyro.attitude));
+    }
+
+    private static Quaternion GyroToUnity(Quaternion q)
+    {
+        return new Quaternion(q.x, q.y, -q.z, -q.w);
     }
 }

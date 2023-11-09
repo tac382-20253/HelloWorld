@@ -9,16 +9,38 @@ public class Accelerometer : MonoBehaviour
     { 
         ACC_X,
         ACC_Y,
-        ACC_Z
+        ACC_Z,
+        RAW,
+        CROSS_FORWARD,
+        CROSS_RIGHT
     }
     public Element m_element;
 
     TextMeshProUGUI m_text;
+    static Vector3 s_zeroAxis;
+    static float s_deadZone = 0.0f;
+    static float s_maximum = 1.0f;
 
     // Start is called before the first frame update
     void Start()
     {
-        m_text = GetComponent<TextMeshProUGUI>();        
+        m_text = GetComponent<TextMeshProUGUI>();
+        Calibrate();
+    }
+
+    public void Calibrate()
+    {
+        s_zeroAxis = Input.acceleration.normalized;
+    }
+
+    public void SetDeadZone(float value)
+    {
+        s_deadZone = value;
+    }
+
+    public void SetMaximum(float value)
+    {
+        s_maximum = value;
     }
 
     // Update is called once per frame
@@ -27,14 +49,53 @@ public class Accelerometer : MonoBehaviour
         switch (m_element)
         {
             case Element.ACC_X:
-                m_text.text = Input.acceleration.x.ToString();
+                if (m_text)
+                    m_text.text = Input.acceleration.x.ToString();
                 break;
             case Element.ACC_Y:
-                m_text.text = Input.acceleration.y.ToString();
+                if (m_text)
+                    m_text.text = Input.acceleration.y.ToString();
                 break;
             case Element.ACC_Z:
-                m_text.text = Input.acceleration.z.ToString();
+                if (m_text)
+                    m_text.text = Input.acceleration.z.ToString();
+                break;
+            case Element.RAW:
+                {
+                    Vector3 pos = transform.position;
+                    transform.LookAt(pos + Input.acceleration, Vector3.up);
+                }
+                break;
+            case Element.CROSS_FORWARD:
+                if (m_text)
+                {
+                    Vector3 acc = Input.acceleration;
+                    acc.Normalize();
+                    Vector3 cross = Vector3.Cross(s_zeroAxis, acc);
+                    m_text.text = ApplyPowerAndDeadZone(cross.x).ToString();
+                }
+                break;
+            case Element.CROSS_RIGHT:
+                if (m_text)
+                {
+                    Vector3 acc = Input.acceleration;
+                    acc.Normalize();
+                    Vector3 cross = Vector3.Cross(s_zeroAxis, acc);
+                    m_text.text = ApplyPowerAndDeadZone(-cross.y).ToString();
+                }
                 break;
         }
+    }
+
+    static float ApplyPowerAndDeadZone(float input)
+    {
+        if (Mathf.Abs(input) <= s_deadZone)
+            return 0.0f;
+        float sign = Mathf.Sign(input);
+        float output = sign * input;
+        output = (output - s_deadZone) / (s_maximum - s_deadZone);
+        output = Mathf.Clamp01(output);
+        output = sign * output;
+        return output;
     }
 }
