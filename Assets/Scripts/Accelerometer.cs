@@ -72,6 +72,7 @@ public class Accelerometer : MonoBehaviour
                     Vector3 acc = Input.acceleration;
                     acc.Normalize();
                     Vector3 cross = Vector3.Cross(s_zeroAxis, acc);
+                    // forward/back is always the phone X axis
                     m_text.text = ApplyPowerAndDeadZone(cross.x).ToString();
                 }
                 break;
@@ -81,7 +82,10 @@ public class Accelerometer : MonoBehaviour
                     Vector3 acc = Input.acceleration;
                     acc.Normalize();
                     Vector3 cross = Vector3.Cross(s_zeroAxis, acc);
-                    m_text.text = ApplyPowerAndDeadZone(-cross.y).ToString();
+                    // left/right is an axis parallel to the ground and perpendicular to the X axis
+                    Vector3 axis = Vector3.Cross(s_zeroAxis, Vector3.right).normalized;
+                    float answer = Vector3.Dot(cross, axis);
+                    m_text.text = ApplyPowerAndDeadZone(answer).ToString();
                 }
                 break;
         }
