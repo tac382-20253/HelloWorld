@@ -3302,7 +3302,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 980359347}
         m_TargetAssemblyTypeName: Accelerometer, Assembly-CSharp
-        m_MethodName: SetPower
+        m_MethodName: SetMaximum
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
