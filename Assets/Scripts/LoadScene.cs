@@ -9,6 +9,7 @@ public class LoadScene : MonoBehaviour
 
     public void OnButtonPress()
     {
+        Debug.Log("Loading Scene " + m_sceneToLoad);
         SceneManager.LoadScene(m_sceneToLoad);
     }
 }
